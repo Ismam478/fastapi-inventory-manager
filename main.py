@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, RedirectResponse
 from src.database_model import Product, ItemInput, BaseM, User, UserInput, UserLoginInput
 from src.database import Session1, engine1
 import src.database_model as db_model
@@ -42,8 +43,39 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/")
-def welcome(db: Session = Depends(get_db)):
-    return {"message": "Welcome to NEXORA!"}
+def root():
+    """Redirect to home page"""
+    return RedirectResponse(url="/home")
+
+
+@app.get("/home")
+def home():
+    """Serve the frontend HTML"""
+    html_path = Path("src/homepage.html")
+    if html_path.exists():
+        return FileResponse(html_path, media_type="text/html")
+    return {"error": "Frontend not found"}
+
+@app.get("/products")
+def get_products(db: Session = Depends(get_db)):
+    """Get all products"""
+    html_path = Path("src/products.html")
+    if html_path.exists():
+        return FileResponse(html_path, media_type="text/html")
+    return db.query(Product).all()
+
+@app.get("/api/status")
+def api_status(db: Session = Depends(get_db)):
+    """Check API status"""
+    return {
+        "status": "online",
+        "message": "NEXORA API is running",
+        "endpoints": [
+            "/home - Frontend",
+            "/products/ - Get all products",
+            "/docs - API Documentation"
+        ]
+    }
 
 
 # Include routers

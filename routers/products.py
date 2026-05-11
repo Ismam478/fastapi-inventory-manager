@@ -55,6 +55,7 @@ def list_products(
         query = query.filter(Product.in_stock == in_stock)
     
     products = query.all()
+    
     return {
         "total": len(products),
         "products": products
