@@ -4,7 +4,7 @@ import urllib.parse
 
 
 # 1. Encode the password to handle the '@' symbol
-password = urllib.parse.quote_plus("Negom@ggs69")
+password = urllib.parse.quote_plus("**********")
 
 
 # 2. Construct the URL using the encoded password
