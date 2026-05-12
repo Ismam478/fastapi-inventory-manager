@@ -8,8 +8,8 @@ import aiofiles
 from pathlib import Path
 
 router = APIRouter(
-    prefix="/products",
-    tags=["products"],
+    prefix="/admin",
+    tags=["admin"],
 )
 
 UPLOAD_DIR = "static/uploads"
@@ -62,7 +62,7 @@ def list_products(
     }
 
 
-@router.post("/admin/add_products")
+@router.post("/add_products")
 def add_products(item: ItemInput, db: Session = Depends(get_db)):
     new_product = Product(**item.model_dump())
     db.add(new_product)
@@ -71,7 +71,7 @@ def add_products(item: ItemInput, db: Session = Depends(get_db)):
     return {"message": "Product added successfully!", "product": new_product}
 
 
-@router.delete("/admin/delete_products")
+@router.delete("/delete_products")
 def delete_products(product_id: int, db: Session = Depends(get_db)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if product:
@@ -84,7 +84,7 @@ def delete_products(product_id: int, db: Session = Depends(get_db)):
         return {"message": f"Product with id {product_id} not found."}
     
 
-@router.put("/admin/update_products")
+@router.put("/update_products")
 def update_products(product_id: int, item: ItemInput, db: Session = Depends(get_db)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if product:
@@ -101,7 +101,7 @@ def update_products(product_id: int, item: ItemInput, db: Session = Depends(get_
 
 # ============ IMAGE UPLOAD ENDPOINT ============
 
-@router.post("/admin/upload-image")
+@router.post("/upload-image")
 async def upload_product_image(
     product_id: int,
     file: UploadFile = File(...),
@@ -144,83 +144,3 @@ async def upload_product_image(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
-
-
-# ============ REVIEW ENDPOINTS ============
-
-@router.post("/{product_id}/reviews")
-def add_review(
-    product_id: int,
-    review: ReviewInput,
-    user_id: int = Query(...),  # In production, get from JWT token
-    db: Session = Depends(get_db)
-):
-    """Add a review to a product"""
-    # Verify product exists
-    product = db.query(Product).filter(Product.id == product_id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    # Create new review
-    new_review = Review(
-        product_id=product_id,
-        user_id=user_id,
-        rating=review.rating,
-        comment=review.comment
-    )
-    db.add(new_review)
-    db.commit()
-    db.refresh(new_review)
-    
-    return {
-        "message": "Review added successfully",
-        "review": ReviewResponse.from_orm(new_review)
-    }
-
-
-@router.get("/{product_id}/reviews")
-def get_product_reviews(
-    product_id: int,
-    db: Session = Depends(get_db)
-):
-    """Get all reviews for a product with average rating"""
-    # Verify product exists
-    product = db.query(Product).filter(Product.id == product_id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    reviews = db.query(Review).filter(Review.product_id == product_id).order_by(Review.created_at.desc()).all()
-    
-    # Calculate average rating
-    avg_rating_result = db.query(func.avg(Review.rating)).filter(
-        Review.product_id == product_id
-    ).scalar()
-    avg_rating = float(avg_rating_result) if avg_rating_result else 0
-    
-    return {
-        "product_id": product_id,
-        "total_reviews": len(reviews),
-        "average_rating": round(avg_rating, 1),
-        "reviews": [ReviewResponse.from_orm(r) for r in reviews]
-    }
-
-
-@router.delete("/{product_id}/reviews/{review_id}")
-def delete_review(
-    product_id: int,
-    review_id: int,
-    db: Session = Depends(get_db)
-):
-    """Delete a review (optional - in production, verify ownership)"""
-    review = db.query(Review).filter(
-        Review.id == review_id,
-        Review.product_id == product_id
-    ).first()
-    
-    if not review:
-        raise HTTPException(status_code=404, detail="Review not found")
-    
-    db.delete(review)
-    db.commit()
-    
-    return {"message": "Review deleted successfully"}

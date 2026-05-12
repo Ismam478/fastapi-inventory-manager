@@ -2,6 +2,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float, Text, JSON, Boolean, DateTime, ForeignKey
 from pydantic import BaseModel, validator
 from datetime import datetime
+from typing import Optional
 
 
 BaseM = declarative_base()
@@ -41,12 +42,12 @@ class Contact(BaseM):
 
 
 class ItemInput(BaseModel):
-    id : int
-    name : str
-    price : float
-    description : str
-    quantity : int
-    in_stock : bool
+    name: str
+    price: float
+    description: str
+    quantity: int
+    in_stock: Optional[bool] = None
+    image_url: Optional[str] = None
     
     @validator('in_stock', pre=False, always=True)
     def set_in_stock_from_quantity(cls, v, values):

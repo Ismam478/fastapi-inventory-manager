@@ -7,7 +7,7 @@ from src.database import Session1, engine1
 import src.database_model as db_model
 from sqlalchemy.orm import Session
 from src.authentication import hash_password, verify_password
-from routers import users, products, contact
+from routers import users, products, contact, admin
 from pathlib import Path
 
 
@@ -64,6 +64,30 @@ def get_products(db: Session = Depends(get_db)):
         return FileResponse(html_path, media_type="text/html")
     return db.query(Product).all()
 
+@app.get("/signup")
+def signup_page():
+    """Serve the signup page"""
+    html_path = Path("src/signup.html")
+    if html_path.exists():
+        return FileResponse(html_path, media_type="text/html")
+    return {"error": "Signup page not found"}
+
+@app.get("/login")
+def login_page():
+    """Serve the login page"""
+    html_path = Path("src/login.html")
+    if html_path.exists():
+        return FileResponse(html_path, media_type="text/html")
+    return {"error": "Login page not found"}
+
+@app.get("/admin")
+def admin_page():
+    """Serve the admin dashboard"""
+    html_path = Path("src/admin.html")
+    if html_path.exists():
+        return FileResponse(html_path, media_type="text/html")
+    return {"error": "Admin page not found"}
+
 @app.get("/api/status")
 def api_status(db: Session = Depends(get_db)):
     """Check API status"""
@@ -82,6 +106,7 @@ def api_status(db: Session = Depends(get_db)):
 app.include_router(users.router)
 app.include_router(products.router)
 app.include_router(contact.router)
+app.include_router(admin.router)
 
 
 @app.get("/products/{product_id}")

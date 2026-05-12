@@ -543,7 +543,7 @@
             <!-- Header -->
             <div class="header">
                 <h1 class="header-title">Product Catalog</h1>
-                <p class="header-subtitle">Browse our complete collection of imported goods</p>
+                <p class="header-subtitle">Browse our Inventory</p>
             </div>
 
             <!-- Filters -->
@@ -563,7 +563,7 @@
                         type="number" 
                         id="minPrice" 
                         class="filter-input" 
-                        placeholder="$0"
+                        placeholder="৳0"
                         onchange="filterProducts()"
                     >
                 </div>
@@ -573,7 +573,7 @@
                         type="number" 
                         id="maxPrice" 
                         class="filter-input" 
-                        placeholder="$9999"
+                        placeholder="৳9999"
                         onchange="filterProducts()"
                     >
                 </div>
@@ -604,7 +604,7 @@
 
     <!-- Footer -->
     <footer>
-        <p class="footer-text">© 2026 Global Import Solutions. All rights reserved. | <a href="/home" style="color: var(--primary); text-decoration: none;">Back to Home</a></p>
+        <p class="footer-text">© 2026 Nexora. All rights reserved. | <a href="/home" style="color: var(--primary); text-decoration: none;">Back to Home</a></p>
     </footer>
 
     <div class="toast" id="toast"></div>
@@ -665,11 +665,11 @@
                         </div>
                         <div class="product-badge">${p.category || 'Product'}</div>
                         <div class="product-content">
-                            <div class="product-category">${p.category || 'PRODUCTS'}</div>
+                            <div class="product-category">${p.category || 'NAME'}</div>
                             <div class="product-name">${p.name}</div>
                             <div class="product-desc">${p.description || 'Quality imported product'}</div>
                             <div class="product-footer">
-                                <div class="product-price">$${p.price?.toFixed(2)}</div>
+                                <div class="product-price">৳${p.price?.toFixed(2)}</div>
                                 <div class="product-quantity"><b>${p.quantity}</b> units</div>
                             </div>
                         </div>

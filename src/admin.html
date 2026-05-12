@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin — Nexora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:         #080808;
+            --bg2:        #0e0e0e;
+            --bg3:        #161616;
+            --card:       #111111;
+            --border:     rgba(255, 255, 255, 0.07);
+            --border-h:   rgba(255, 255, 255, 0.13);
+            --gold:       #d97706;
+            --gold-l:     #f59e0b;
+            --gold-bright:#fcd34d;
+            --gold-dim:   rgba(217, 119, 6, 0.1);
+            --gold-glow:  rgba(217, 119, 6, 0.22);
+            --text:       #f0ebe0;
+            --text-2:     #a8a399;
+            --muted:      #57534e;
+            --muted-2:    #3a3733;
+            --success:    #4ade80;
+            --danger:     #f87171;
+            --warning:    #fb923c;
+            --sidebar-w:  264px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.55;
+        }
+
+        /* Subtle grid texture */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ================================================================
+           LAYOUT
+        ================================================================ */
+        .layout {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ================================================================
+           SIDEBAR
+        ================================================================ */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            left: 0; top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--muted-2); }
+
+        /* Gold accent line */
+        .sidebar-accent {
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-dim) 60%, transparent);
+            flex-shrink: 0;
+        }
+
+        .sidebar-top {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: var(--text);
+            text-transform: uppercase;
+        }
+
+        .logo em {
+            font-style: normal;
+            color: var(--gold);
+        }
+
+        .admin-chip {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: var(--gold-dim);
+            border: 1px solid rgba(217,119,6,0.28);
+            padding: 3px 8px;
+            border-radius: 2px;
+        }
+
+        .sidebar-clock {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* Nav */
+        .sidebar-nav {
+            flex: 1;
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .nav-group-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--muted-2);
+            padding: 12px 8px 5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 12px;
+            border-radius: 3px;
+            color: var(--text-2);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            font-size: 13.5px;
+            font-weight: 500;
+            border: 1px solid transparent;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: 'DM Sans', sans-serif;
+            position: relative;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 0;
+            background: var(--gold);
+            transition: height 0.2s ease;
+            border-radius: 0 1px 1px 0;
+        }
+
+        .nav-item:hover {
+            background: var(--bg3);
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        .nav-item.active {
+            background: var(--gold-dim);
+            color: var(--gold-l);
+            border-color: rgba(217,119,6,0.22);
+        }
+
+        .nav-item.active::before {
+            height: 18px;
+        }
+
+        .nav-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            opacity: 0.65;
+        }
+
+        .nav-item.active .nav-icon,
+        .nav-item:hover .nav-icon { opacity: 1; }
+
+        /* Sidebar bottom */
+        .sidebar-bottom {
+            padding: 14px 12px 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(248,113,113,0.05);
+            border: 1px solid rgba(248,113,113,0.14);
+            border-radius: 3px;
+            color: #fca5a5;
+            cursor: pointer;
+            font-size: 13.5px;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+            transition: background 0.15s, border-color 0.15s;
+            text-align: left;
+        }
+
+        .logout-btn:hover {
+            background: rgba(248,113,113,0.1);
+            border-color: rgba(248,113,113,0.25);
+        }
+
+        /* ================================================================
+           MAIN PANEL
+        ================================================================ */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Topbar */
+        .topbar {
+            padding: 18px 36px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(8,8,8,0.85);
+            backdrop-filter: blur(14px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            gap: 16px;
+        }
+
+        .page-heading {
+            font-family: 'Syne', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Search */
+        .search-wrap {
+            position: relative;
+        }
+
+        .search-icon-pos {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            pointer-events: none;
+            display: flex;
+        }
+
+        .search-input {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 8px 14px 8px 34px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            width: 210px;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .search-input::placeholder { color: var(--muted); }
+
+        .search-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px var(--gold-dim);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 9px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, color 0.15s;
+            border: 1px solid transparent;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+            font-weight: 700;
+        }
+
+        .btn-primary:hover {
+            background: var(--gold-l);
+            border-color: var(--gold-l);
+            box-shadow: 0 4px 18px var(--gold-glow);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-2);
+            border-color: var(--border);
+        }
+
+        .btn-ghost:hover {
+            background: var(--bg3);
+            border-color: var(--border-h);
+            color: var(--text);
+        }
+
+        .btn-danger {
+            background: rgba(248,113,113,0.08);
+            color: var(--danger);
+            border-color: rgba(248,113,113,0.18);
+        }
+
+        .btn-danger:hover {
+            background: rgba(248,113,113,0.14);
+            border-color: rgba(248,113,113,0.3);
+            box-shadow: 0 0 14px rgba(248,113,113,0.15);
+        }
+
+        .btn-sm {
+            padding: 6px 11px;
+            font-size: 12px;
+            gap: 5px;
+        }
+
+        /* ================================================================
+           PAGE SECTIONS
+        ================================================================ */
+        .page-section {
+            display: none;
+            padding: 30px 36px 48px;
+            animation: fadeUp 0.22s ease both;
+        }
+
+        .page-section.active { display: block; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================================================================
+           STATS GRID
+        ================================================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 20px 22px 18px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(217,119,6,0.28);
+        }
+
+        .stat-card:hover::after { opacity: 1; }
+
+        .stat-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 7px;
+        }
+
+        .stat-value.clr-success { color: var(--success); }
+        .stat-value.clr-danger  { color: var(--danger); }
+        .stat-value.clr-gold    { color: var(--gold-l); }
+
+        .stat-sub {
+            font-family: 'DM Mono', monospace;
+            font-size: 10.5px;
+            color: var(--muted);
+        }
+
+        /* ================================================================
+           SECTION HEADER
+        ================================================================ */
+        .sec-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            gap: 12px;
+        }
+
+        .sec-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .sec-meta {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        /* ================================================================
+           FILTER BAR
+        ================================================================ */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 13px 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+        }
+
+        .filter-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .filter-input, .filter-select {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 7px 10px;
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .filter-input { width: 90px; }
+
+        .filter-input:focus, .filter-select:focus {
+            border-color: var(--gold);
+        }
+
+        .filter-select {
+            cursor: pointer;
+            padding-right: 28px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2357534e'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        /* ================================================================
+           TABLE
+        ================================================================ */
+        .table-wrap {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg3);
+            border-bottom: 1px solid rgba(217,119,6,0.18);
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-family: 'DM Mono', monospace;
+            font-size: 9.5px;
+            font-weight: 500;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13.5px;
+            vertical-align: middle;
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
+
+        tbody tr { transition: background 0.1s; }
+
+        tbody tr:hover { background: rgba(217,119,6,0.04); }
+
+        .td-id {
+            font-family: 'DM Mono', monospace;
+            font-size: 11.5px;
+            color: var(--muted);
+        }
+
+        .td-price {
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gold-l);
+        }
+
+        .td-qty {
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .td-qty.low  { color: var(--warning); }
+        .td-qty.zero { color: var(--danger); }
+
+        .td-desc {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 12.5px;
+            color: var(--text-2);
+        }
+
+        /* Product thumbnail */
+        .thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: 3px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            display: block;
+            background: var(--bg3);
+        }
+
+        .no-thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: 3px;
+            background: var(--bg3);
+            border: 1px dashed var(--border-h);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted-2);
+            font-size: 15px;
+            cursor: pointer;
+            transition: border-color 0.15s;
+            flex-shrink: 0;
+        }
+
+        .no-thumb:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: 2px;
+            font-family: 'DM Mono', monospace;
+            font-size: 9.5px;
+            font-weight: 500;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .badge-in  { background: rgba(74,222,128,0.09);  color: var(--success); border: 1px solid rgba(74,222,128,0.2); }
+        .badge-out { background: rgba(248,113,113,0.09); color: var(--danger);  border: 1px solid rgba(248,113,113,0.2); }
+        .badge-low { background: rgba(251,146,60,0.09);  color: var(--warning); border: 1px solid rgba(251,146,60,0.2); }
+
+        .badge-in::before  { background: var(--success); }
+        .badge-out::before { background: var(--danger);  }
+        .badge-low::before { background: var(--warning); }
+
+        /* Action cell */
+        .actions { display: flex; gap: 6px; align-items: center; }
+
+        /* ================================================================
+           STATES (loading / empty / error)
+        ================================================================ */
+        .state-box {
+            padding: 52px 24px;
+            text-align: center;
+        }
+
+        .state-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+            opacity: 0.35;
+        }
+
+        .state-text {
+            font-size: 13.5px;
+            color: var(--muted);
+            font-family: 'DM Mono', monospace;
+        }
+
+        /* Loading dots */
+        .dots {
+            display: inline-flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .dots span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--gold);
+            animation: pulse 1.3s ease-in-out infinite;
+        }
+
+        .dots span:nth-child(2) { animation-delay: 0.18s; }
+        .dots span:nth-child(3) { animation-delay: 0.36s; }
+
+        @keyframes pulse {
+            0%, 80%, 100% { opacity: 0.15; transform: scale(0.85); }
+            40%            { opacity: 1;    transform: scale(1); }
+        }
+
+        /* ================================================================
+           MODALS
+        ================================================================ */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.72);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(6px);
+        }
+
+        .overlay.open { display: flex; }
+
+        .modal {
+            background: var(--bg2);
+            border: 1px solid var(--border-h);
+            border-radius: 4px;
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            animation: modalIn 0.2s ease both;
+            overflow: hidden;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(-12px); }
+            to   { opacity: 1; transform: scale(1)    translateY(0); }
+        }
+
+        .modal-stripe {
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), transparent 70%);
+        }
+
+        .modal-stripe.danger {
+            background: linear-gradient(90deg, var(--danger), transparent 70%);
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 17px;
+            padding: 4px 6px;
+            transition: color 0.15s;
+            line-height: 1;
+            border-radius: 2px;
+        }
+
+        .modal-close:hover { color: var(--text); background: var(--bg3); }
+
+        .modal-body { padding: 22px; }
+
+        .modal-foot {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 14px 22px;
+            border-top: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        /* Form elements */
+        .form-group { margin-bottom: 15px; }
+        .form-group:last-child { margin-bottom: 0; }
+
+        .form-label {
+            display: block;
+            font-family: 'DM Mono', monospace;
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 9px 12px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13.5px;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px var(--gold-dim);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 82px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Delete confirm */
+        .delete-copy {
+            font-size: 13.5px;
+            color: var(--text-2);
+            line-height: 1.65;
+        }
+
+        .delete-copy mark {
+            background: none;
+            color: var(--danger);
+            font-family: 'DM Mono', monospace;
+            font-size: 12.5px;
+        }
+
+        /* Upload modal */
+        .upload-for {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+
+        .upload-for span {
+            color: var(--gold-l);
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border-h);
+            border-radius: 3px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .drop-zone:hover, .drop-zone.over {
+            border-color: var(--gold);
+            background: var(--gold-dim);
+        }
+
+        .drop-zone p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 10px;
+        }
+
+        .drop-zone small {
+            font-family: 'DM Mono', monospace;
+            font-size: 10.5px;
+            color: var(--muted-2);
+        }
+
+        #img-preview {
+            display: none;
+            width: 100%;
+            max-height: 170px;
+            object-fit: contain;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+            margin-top: 12px;
+        }
+
+        .upload-filename {
+            display: none;
+            margin-top: 8px;
+            font-family: 'DM Mono', monospace;
+            font-size: 10.5px;
+            color: var(--muted);
+        }
+
+        /* ================================================================
+           TOAST NOTIFICATIONS
+        ================================================================ */
+        .toast-stack {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 16px;
+            background: var(--bg2);
+            border: 1px solid var(--border-h);
+            border-radius: 3px;
+            font-size: 13px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+            animation: toastIn 0.22s ease both;
+            min-width: 240px;
+            max-width: 340px;
+            pointer-events: all;
+        }
+
+        .toast.success { border-left: 2px solid var(--success); }
+        .toast.error   { border-left: 2px solid var(--danger);  }
+        .toast.info    { border-left: 2px solid var(--gold);    }
+
+        .toast-icon {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.error   .toast-icon { color: var(--danger);  }
+        .toast.info    .toast-icon { color: var(--gold-l);  }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(14px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateX(0); }
+            to   { opacity: 0; transform: translateX(14px); }
+        }
+
+        /* ================================================================
+           RESPONSIVE
+        ================================================================ */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 980px) {
+            :root { --sidebar-w: 220px; }
+        }
+
+        @media (max-width: 840px) {
+            .layout { flex-direction: column; }
+
+            .sidebar {
+                position: sticky; top: 0;
+                width: 100%; height: auto;
+                flex-direction: column;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                overflow-y: visible;
+            }
+
+            .sidebar-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 10px 12px;
+            }
+
+            .nav-group-label { display: none; }
+
+            .sidebar-bottom {
+                border-top: none;
+                border-top: 1px solid var(--border);
+                padding: 10px 12px;
+            }
+
+            .main { margin-left: 0; }
+            .topbar, .page-section { padding: 16px 20px; }
+        }
+
+        @media (max-width: 640px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .search-input { width: 150px; }
+            .topbar { flex-wrap: wrap; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .stat-value { font-size: 28px; }
+            .page-section { padding: 14px 14px 40px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ============================================================
+         SIDEBAR
+    ============================================================ -->
+    <aside class="sidebar">
+        <div class="sidebar-accent"></div>
+
+        <div class="sidebar-top">
+            <div class="logo-row">
+                <div class="logo">NEX<em>O</em>RA</div>
+                <div class="admin-chip">Admin</div>
+            </div>
+            <div class="sidebar-clock" id="sidebar-clock">—</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-group-label">Control Panel</div>
+
+            <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">
+                <span class="nav-icon">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                </span>
+                Dashboard
+            </button>
+
+            <button class="nav-item" data-page="products" onclick="showPage('products', this)">
+                <span class="nav-icon">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                        <line x1="12" y1="22.08" x2="12" y2="12"/>
+                    </svg>
+                </span>
+                Products
+            </button>
+
+            <div class="nav-group-label" style="margin-top:10px">Site</div>
+
+            <a class="nav-item" href="/home">
+                <span class="nav-icon">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </span>
+                Back to Site
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="logout-btn" onclick="logout()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- ============================================================
+         MAIN PANEL
+    ============================================================ -->
+    <div class="main">
+
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="page-heading" id="page-heading">Dashboard</div>
+            <div class="topbar-right">
+                <div class="search-wrap">
+                    <span class="search-icon-pos">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </span>
+                    <input
+                        id="search-input"
+                        type="text"
+                        class="search-input"
+                        placeholder="Search products…"
+                        oninput="debouncedSearch(this.value)"
+                    />
+                </div>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5"  y1="12" x2="19" y2="12"/>
+                    </svg>
+                    New Product
+                </button>
+            </div>
+        </div>
+
+        <!-- ====================================================
+             DASHBOARD SECTION
+        ==================================================== -->
+        <section class="page-section active" id="page-dashboard">
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Products</div>
+                    <div class="stat-value" id="stat-total">—</div>
+                    <div class="stat-sub">in inventory</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">In Stock</div>
+                    <div class="stat-value clr-success" id="stat-instock">—</div>
+                    <div class="stat-sub">available now</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Out of Stock</div>
+                    <div class="stat-value clr-danger" id="stat-outstock">—</div>
+                    <div class="stat-sub">need restock</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg. Price</div>
+                    <div class="stat-value clr-gold" id="stat-avgprice">—</div>
+                    <div class="stat-sub">across catalog</div>
+                </div>
+            </div>
+
+            <!-- Recent inventory table -->
+            <div class="sec-head">
+                <div>
+                    <div class="sec-title">Recent Inventory</div>
+                    <div class="sec-meta" id="dash-meta">Loading…</div>
+                </div>
+                <button class="btn btn-ghost btn-sm"
+                    onclick="showPage('products', document.querySelector('[data-page=products]'))">
+                    View All &rarr;
+                </button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Img</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dash-tbody">
+                        <tr><td colspan="6"><div class="state-box"><div class="dots"><span></span><span></span><span></span></div></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ====================================================
+             PRODUCTS SECTION
+        ==================================================== -->
+        <section class="page-section" id="page-products">
+
+            <div class="sec-head">
+                <div>
+                    <div class="sec-title">Product Management</div>
+                    <div class="sec-meta" id="products-meta">Loading…</div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="openAddModal()">
+                    <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5"  y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Add Product
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-bar">
+                <span class="filter-label">Min ৳</span>
+                <input type="number" id="filter-min" class="filter-input" placeholder="0.00" oninput="applyFilters()" />
+                <span class="filter-label">Max ৳</span>
+                <input type="number" id="filter-max" class="filter-input" placeholder="9999" oninput="applyFilters()" />
+                <span class="filter-label">Stock</span>
+                <select id="filter-stock" class="filter-select" onchange="applyFilters()">
+                    <option value="">All</option>
+                    <option value="true">In Stock</option>
+                    <option value="false">Out of Stock</option>
+                </select>
+                <button class="btn btn-ghost btn-sm" onclick="resetFilters()" style="margin-left:auto">
+                    Reset Filters
+                </button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Img</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-tbody">
+                        <tr><td colspan="8"><div class="state-box"><div class="dots"><span></span><span></span><span></span></div></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-stack" id="toast-stack"></div>
+
+<!-- ================================================================
+     MODAL: ADD / EDIT PRODUCT
+================================================================ -->
+<div class="overlay" id="overlay-product">
+    <div class="modal">
+        <div class="modal-stripe"></div>
+        <div class="modal-head">
+            <span class="modal-title" id="modal-product-title">Add Product</span>
+            <button class="modal-close" onclick="closeModal('overlay-product')">&#10005;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="edit-id" />
+
+            <div class="form-group">
+                <label class="form-label">Product Image</label>
+                <div id="image-preview-container" style="margin-bottom: 12px; display: none;">
+                    <img id="form-image-preview" src="" alt="Product Image" style="width: 100%; max-width: 200px; height: auto; border-radius: 8px; border: 1px solid rgba(217,119,6,0.2); padding: 4px;">
+                    <input type="hidden" id="f-image-url" />
+                    <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">
+                        <a href="javascript:void(0)" onclick="clearProductImage()" style="color: var(--danger); text-decoration: none;">Remove image</a>
+                    </p>
+                </div>
+                <button type="button" class="btn btn-ghost" onclick="openUploadModalFromForm()" style="width: 100%;">📸 Upload Product Image</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Product Name *</label>
+                <input type="text" id="f-name" class="form-input" placeholder="e.g. Wireless Headphones" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Price (৳) *</label>
+                    <input type="number" id="f-price" class="form-input" placeholder="0.00" step="0.01" min="0" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Quantity *</label>
+                    <input type="number" id="f-qty" class="form-input" placeholder="0" min="0" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="f-desc" class="form-textarea" placeholder="Product description…"></textarea>
+            </div>
+        </div>
+        <div class="modal-foot">
+            <button class="btn btn-ghost" onclick="closeModal('overlay-product')">Cancel</button>
+            <button class="btn btn-primary" id="btn-submit-product" onclick="submitProductForm()">Add Product</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================
+     MODAL: DELETE CONFIRM
+================================================================ -->
+<div class="overlay" id="overlay-delete">
+    <div class="modal" style="max-width:400px">
+        <div class="modal-stripe danger"></div>
+        <div class="modal-head">
+            <span class="modal-title">Confirm Delete</span>
+            <button class="modal-close" onclick="closeModal('overlay-delete')">&#10005;</button>
+        </div>
+        <div class="modal-body">
+            <p class="delete-copy">
+                You are about to permanently delete&nbsp;
+                <mark id="delete-name">"this product"</mark>.
+                <br /><br />
+                All associated data including reviews will also be removed.
+                This action <strong>cannot be undone</strong>.
+            </p>
+        </div>
+        <div class="modal-foot">
+            <button class="btn btn-ghost" onclick="closeModal('overlay-delete')">Cancel</button>
+            <button class="btn btn-danger" id="btn-confirm-delete" onclick="confirmDelete()">
+                Delete Permanently
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================
+     MODAL: UPLOAD IMAGE
+================================================================ -->
+<div class="overlay" id="overlay-upload">
+    <div class="modal" style="max-width:420px">
+        <div class="modal-stripe"></div>
+        <div class="modal-head">
+            <span class="modal-title">Upload Product Image</span>
+            <button class="modal-close" onclick="closeModal('overlay-upload')">&#10005;</button>
+        </div>
+        <div class="modal-body">
+            <div class="upload-for">
+                Product: <span id="upload-product-label">—</span>
+            </div>
+
+            <div class="drop-zone" id="drop-zone"
+                onclick="document.getElementById('file-input').click()"
+                ondragover="onDragOver(event)"
+                ondragleave="onDragLeave(event)"
+                ondrop="onDrop(event)">
+                <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5"
+                    viewBox="0 0 24 24" style="color:var(--muted);margin:0 auto;display:block">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <p>Click or drag &amp; drop your image here</p>
+                <small>JPG · JPEG · PNG · GIF · WEBP</small>
+            </div>
+
+            <input type="file" id="file-input" accept=".jpg,.jpeg,.png,.gif,.webp"
+                style="display:none" onchange="onFileSelect(this.files[0])" />
+            <img id="img-preview" alt="Preview" />
+            <div class="upload-filename" id="upload-filename"></div>
+        </div>
+        <div class="modal-foot">
+            <button class="btn btn-ghost" onclick="closeModal('overlay-upload')">Cancel</button>
+            <button class="btn btn-primary" id="btn-upload" onclick="submitUpload()" disabled>
+                Upload Image
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================
+     JAVASCRIPT
+================================================================ -->
+<script>
+    'use strict';
+
+    // ---------------------------------------------------------------
+    // State
+    // ---------------------------------------------------------------
+    let allProducts    = [];
+    let pendingDelete  = null;   // product id
+    let pendingUpload  = null;   // product id
+    let uploadFile     = null;
+    let searchTimer    = null;
+
+    // ---------------------------------------------------------------
+    // Bootstrap
+    // ---------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+        startClock();
+        loadProducts();
+        bindOverlayClose();
+        bindEscClose();
+    });
+
+    function startClock() {
+        const el = document.getElementById('sidebar-clock');
+        const tick = () => {
+            const now = new Date();
+            el.textContent = now.toLocaleTimeString('en-US', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        };
+        tick();
+        setInterval(tick, 1000);
+    }
+
+    // ---------------------------------------------------------------
+    // Navigation
+    // ---------------------------------------------------------------
+    const PAGE_TITLES = {
+        dashboard: 'Dashboard',
+        products:  'Products',
+    };
+
+    function showPage(page, triggerBtn) {
+        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
+
+        const section = document.getElementById('page-' + page);
+        if (section) section.classList.add('active');
+        if (triggerBtn) triggerBtn.classList.add('active');
+
+        document.getElementById('page-heading').textContent = PAGE_TITLES[page] || page;
+    }
+
+    // ---------------------------------------------------------------
+    // API Helpers
+    // ---------------------------------------------------------------
+    async function apiGet(url) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    }
+
+    async function apiPost(url, body) {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    }
+
+    async function apiPut(url, body) {
+        const res = await fetch(url, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    }
+
+    async function apiDelete(url) {
+        const res = await fetch(url, { method: 'DELETE' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    }
+
+    // ---------------------------------------------------------------
+    // Load Products  →  GET /admin/
+    // ---------------------------------------------------------------
+    async function loadProducts(params = {}) {
+        setLoading('dash-tbody',     6);
+        setLoading('products-tbody', 8);
+
+        const qs = new URLSearchParams();
+        if (params.search    ) qs.set('search',    params.search);
+        if (params.min_price ) qs.set('min_price',  params.min_price);
+        if (params.max_price ) qs.set('max_price',  params.max_price);
+        if (params.in_stock !== undefined && params.in_stock !== '')
+                               qs.set('in_stock',   params.in_stock);
+
+        try {
+            const data = await apiGet('/admin/?' + qs.toString());
+            allProducts = data.products || [];
+            renderStats(allProducts);
+            renderDashboard(allProducts.slice(0, 8));
+            renderProducts(allProducts);
+        } catch (err) {
+            setError('dash-tbody',     6, 'Could not reach API');
+            setError('products-tbody', 8, 'Could not reach API');
+            toast('error', 'Failed to load products — is the server running?');
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // Stats
+    // ---------------------------------------------------------------
+    function renderStats(products) {
+        const total    = products.length;
+        const inStock  = products.filter(p => p.in_stock).length;
+        const outStock = total - inStock;
+        const avg      = total > 0
+            ? '৳' + (products.reduce((s, p) => s + (p.price || 0), 0) / total).toFixed(2)
+            : '৳0.00';
+
+        setText('stat-total',    total);
+        setText('stat-instock',  inStock);
+        setText('stat-outstock', outStock);
+        setText('stat-avgprice', avg);
+        setText('dash-meta',     `${total} products · ${inStock} in stock`);
+    }
+
+    // ---------------------------------------------------------------
+    // Render Helpers
+    // ---------------------------------------------------------------
+    function stockBadge(p) {
+        if (!p.in_stock)      return '<span class="badge badge-out">Out of Stock</span>';
+        if (p.quantity <= 10) return '<span class="badge badge-low">Low Stock</span>';
+        return '<span class="badge badge-in">In Stock</span>';
+    }
+
+    function qtyClass(qty) {
+        if (qty === 0)   return 'zero';
+        if (qty <= 10)   return 'low';
+        return '';
+    }
+
+    function thumbCell(p, clickable = false) {
+        if (p.image_url) {
+            return `<img
+                src="${p.image_url}"
+                class="thumb"
+                alt="${h(p.name)}"
+                onerror="this.outerHTML='<div class=no-thumb title=\\'No image\\'>&#9635;</div>'"
+            />`;
+        }
+        if (clickable) {
+            return `<div class="no-thumb" title="Upload image" onclick="openUploadModal(${p.id}, '${h(p.name)}')">&#65291;</div>`;
+        }
+        return `<div class="no-thumb" title="No image">&#9635;</div>`;
+    }
+
+    // ---------------------------------------------------------------
+    // Dashboard Table (read-only, last 8)
+    // ---------------------------------------------------------------
+    function renderDashboard(products) {
+        const tbody = document.getElementById('dash-tbody');
+        setText('dash-meta', `${allProducts.length} products total · showing recent ${products.length}`);
+
+        if (!products.length) {
+            tbody.innerHTML = emptyRow(6, 'No products in inventory');
+            return;
+        }
+
+        tbody.innerHTML = products.map(p => `
+            <tr>
+                <td class="td-id">#${p.id}</td>
+                <td>${thumbCell(p)}</td>
+                <td><strong>${h(p.name)}</strong></td>
+                <td class="td-price">৳${Number(p.price).toFixed(2)}</td>
+                <td class="td-qty ${qtyClass(p.quantity)}">${p.quantity}</td>
+                <td>${stockBadge(p)}</td>
+            </tr>
+        `).join('');
+    }
+
+    // ---------------------------------------------------------------
+    // Products Table (full CRUD)
+    // ---------------------------------------------------------------
+    function renderProducts(products) {
+        const tbody = document.getElementById('products-tbody');
+        setText('products-meta', `${products.length} product${products.length !== 1 ? 's' : ''}`);
+
+        if (!products.length) {
+            tbody.innerHTML = emptyRow(8, 'No products match your filters');
+            return;
+        }
+
+        tbody.innerHTML = products.map(p => `
+            <tr>
+                <td class="td-id">#${p.id}</td>
+                <td>${thumbCell(p, true)}</td>
+                <td><strong>${h(p.name)}</strong></td>
+                <td class="td-desc" title="${h(p.description || '')}">${h(p.description || '—')}</td>
+                <td class="td-price">$${Number(p.price).toFixed(2)}</td>
+                <td class="td-qty ${qtyClass(p.quantity)}">${p.quantity}</td>
+                <td>${stockBadge(p)}</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-ghost btn-sm" onclick="openEditModal(${p.id})">Edit</button>
+                        <button class="btn btn-ghost btn-sm" title="Upload image"
+                            onclick="openUploadModal(${p.id}, '${h(p.name)}')">
+                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${p.id}, '${h(p.name)}')">Delete</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // ---------------------------------------------------------------
+    // Search & Filters
+    // ---------------------------------------------------------------
+    function debouncedSearch(val) {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(applyFilters, 380);
+    }
+
+    function applyFilters() {
+        loadProducts({
+            search:    document.getElementById('search-input').value.trim(),
+            min_price: document.getElementById('filter-min').value,
+            max_price: document.getElementById('filter-max').value,
+            in_stock:  document.getElementById('filter-stock').value,
+        });
+    }
+
+    function resetFilters() {
+        document.getElementById('filter-min').value   = '';
+        document.getElementById('filter-max').value   = '';
+        document.getElementById('filter-stock').value = '';
+        document.getElementById('search-input').value = '';
+        loadProducts();
+    }
+
+    // ---------------------------------------------------------------
+    // ADD MODAL
+    // ---------------------------------------------------------------
+    function openAddModal() {
+        clearProductForm();
+        document.getElementById('modal-product-title').textContent  = 'Add Product';
+        document.getElementById('btn-submit-product').textContent    = 'Add Product';
+        document.getElementById('edit-id').value = '';
+        openModal('overlay-product');
+    }
+
+    // ---------------------------------------------------------------
+    // EDIT MODAL
+    // ---------------------------------------------------------------
+    function openEditModal(productId) {
+        const p = allProducts.find(x => x.id === productId);
+        if (!p) { toast('error', 'Product not found in local state — please reload.'); return; }
+
+        document.getElementById('modal-product-title').textContent = 'Edit Product';
+        document.getElementById('btn-submit-product').textContent   = 'Save Changes';
+        document.getElementById('edit-id').value    = p.id;
+        document.getElementById('f-name').value     = p.name        || '';
+        document.getElementById('f-price').value    = p.price       || '';
+        document.getElementById('f-qty').value      = p.quantity    || '';
+        document.getElementById('f-desc').value     = p.description || '';
+        openModal('overlay-product');
+    }
+
+    // ---------------------------------------------------------------
+    // SUBMIT PRODUCT FORM  →  POST /admin/add_products
+    //                     →  PUT  /admin/update_products?product_id=X
+    // ---------------------------------------------------------------
+    async function submitProductForm() {
+        const id   = document.getElementById('edit-id').value;
+        const name = document.getElementById('f-name').value.trim();
+        const price    = parseFloat(document.getElementById('f-price').value);
+        const quantity = parseInt(document.getElementById('f-qty').value, 10);
+        const description = document.getElementById('f-desc').value.trim();
+        const imageUrl = document.getElementById('f-image-url').value || null;
+
+        if (!name)              { toast('error', 'Product name is required.');   return; }
+        if (isNaN(price) || price < 0)    { toast('error', 'Enter a valid price.');      return; }
+        if (isNaN(quantity) || quantity < 0) { toast('error', 'Enter a valid quantity.'); return; }
+
+        const btn = document.getElementById('btn-submit-product');
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+
+        const payload = { name, price, description, quantity };
+        if (imageUrl) payload.image_url = imageUrl;
+
+        try {
+            if (id) {
+                await apiPut(`/admin/update_products?product_id=${id}`, payload);
+                toast('success', `"${name}" updated successfully.`);
+            } else {
+                await apiPost('/admin/add_products', payload);
+                toast('success', `"${name}" added to inventory.`);
+            }
+            closeModal('overlay-product');
+            loadProducts();
+        } catch (err) {
+            toast('error', `Save failed — ${err.message}`);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = id ? 'Save Changes' : 'Add Product';
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // DELETE MODAL  →  DELETE /admin/delete_products?product_id=X
+    // ---------------------------------------------------------------
+    function openDeleteModal(id, name) {
+        pendingDelete = id;
+        document.getElementById('delete-name').textContent = `"${name}"`;
+        openModal('overlay-delete');
+    }
+
+    async function confirmDelete() {
+        if (pendingDelete === null) return;
+        const btn = document.getElementById('btn-confirm-delete');
+        btn.disabled = true;
+        btn.textContent = 'Deleting…';
+
+        try {
+            await apiDelete(`/admin/delete_products?product_id=${pendingDelete}`);
+            toast('success', 'Product deleted successfully.');
+            closeModal('overlay-delete');
+            loadProducts();
+        } catch (err) {
+            toast('error', `Delete failed — ${err.message}`);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Delete Permanently';
+            pendingDelete = null;
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // UPLOAD MODAL  →  POST /admin/upload-image?product_id=X
+    // ---------------------------------------------------------------
+    let uploadSourceModal = null; // Track if upload is called from form or table
+
+    function openUploadModalFromForm() {
+        uploadSourceModal = 'form';
+        openUploadModal(0, 'Product Image'); // Use 0 as placeholder when from form
+    }
+
+    function openUploadModal(id, name) {
+        pendingUpload = id;
+        uploadFile    = null;
+
+        document.getElementById('upload-product-label').textContent = `${name} (ID: ${id})`;
+        document.getElementById('img-preview').style.display    = 'none';
+        document.getElementById('upload-filename').style.display = 'none';
+        document.getElementById('file-input').value             = '';
+        document.getElementById('btn-upload').disabled          = true;
+
+        openModal('overlay-upload');
+    }
+
+    function onDragOver(e) {
+        e.preventDefault();
+        document.getElementById('drop-zone').classList.add('over');
+    }
+
+    function onDragLeave() {
+        document.getElementById('drop-zone').classList.remove('over');
+    }
+
+    function onDrop(e) {
+        e.preventDefault();
+        document.getElementById('drop-zone').classList.remove('over');
+        const file = e.dataTransfer.files[0];
+        if (file) onFileSelect(file);
+    }
+
+    function onFileSelect(file) {
+        if (!file) return;
+        uploadFile = file;
+
+        const reader = new FileReader();
+        reader.onload = ev => {
+            const preview = document.getElementById('img-preview');
+            preview.src   = ev.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+
+        const fname = document.getElementById('upload-filename');
+        fname.textContent    = `📎 ${file.name}  (${(file.size / 1024).toFixed(1)} KB)`;
+        fname.style.display  = 'block';
+
+        document.getElementById('btn-upload').disabled = false;
+    }
+
+    async function submitUpload() {
+        if (!uploadFile || pendingUpload === null) return;
+
+        const btn = document.getElementById('btn-upload');
+        btn.disabled    = true;
+        btn.textContent = 'Uploading…';
+
+        try {
+            const form = new FormData();
+            form.append('file', uploadFile);
+            const res = await fetch(`/admin/upload-image?product_id=${pendingUpload}`, {
+                method: 'POST',
+                body: form,
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            toast('success', 'Image uploaded and saved.');
+            closeModal('overlay-upload');
+            loadProducts();
+        } catch (err) {
+            toast('error', `Upload failed — ${err.message}`);
+        } finally {
+            btn.disabled    = false;
+            btn.textContent = 'Upload Image';
+            pendingUpload   = null;
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // Modal Helpers
+    // ---------------------------------------------------------------
+    function openModal(id)  { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { 
+        document.getElementById(id).classList.remove('open');
+        if (id === 'overlay-product') clearProductForm();
+    }
+
+    function bindOverlayClose() {
+        document.querySelectorAll('.overlay').forEach(el => {
+            el.addEventListener('click', function(e) {
+                if (e.target === this) closeModal(this.id);
+            });
+        });
+    }
+
+    function bindEscClose() {
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.overlay.open')
+                    .forEach(o => o.classList.remove('open'));
+            }
+        });
+    }
+
+    function clearProductForm() {
+        ['f-name','f-price','f-qty','f-desc'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
+    }
+
+    // ---------------------------------------------------------------
+    // Toast Notifications
+    // ---------------------------------------------------------------
+    function toast(type, message) {
+        const container = document.getElementById('toast-stack');
+        const icons = { success: '✓', error: '✕', info: 'i' };
+        const el = document.createElement('div');
+        el.className = `toast ${type}`;
+        el.innerHTML = `
+            <span class="toast-icon">${icons[type] || 'i'}</span>
+            <span>${message}</span>
+        `;
+        container.appendChild(el);
+
+        setTimeout(() => {
+            el.style.animation = 'toastOut 0.22s ease forwards';
+            setTimeout(() => el.remove(), 230);
+        }, 3200);
+    }
+
+    // ---------------------------------------------------------------
+    // Utility
+    // ---------------------------------------------------------------
+    function h(str) {
+        // Escape HTML special chars for safe attribute/text output
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function setText(id, val) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    }
+
+    function setLoading(tbodyId, cols) {
+        document.getElementById(tbodyId).innerHTML = `
+            <tr><td colspan="${cols}">
+                <div class="state-box">
+                    <div class="dots"><span></span><span></span><span></span></div>
+                </div>
+            </td></tr>`;
+    }
+
+    function setError(tbodyId, cols, msg) {
+        document.getElementById(tbodyId).innerHTML = `
+            <tr><td colspan="${cols}">
+                <div class="state-box">
+                    <div class="state-icon">&#9888;</div>
+                    <div class="state-text">${msg}</div>
+                </div>
+            </td></tr>`;
+    }
+
+    function emptyRow(cols, msg) {
+        return `<tr><td colspan="${cols}">
+            <div class="state-box">
+                <div class="state-icon">&#128230;</div>
+                <div class="state-text">${msg}</div>
+            </div>
+        </td></tr>`;
+    }
+
+    // ---------------------------------------------------------------
+    // Logout
+    // ---------------------------------------------------------------
+    function logout() {
+        window.location.href = '/login';
+    }
+</script>
+</body>
+</html>
