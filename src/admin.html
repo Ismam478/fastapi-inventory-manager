@@ -992,51 +992,80 @@
             :root { --sidebar-w: 220px; }
         }
 
+        /* ── Mobile Sidebar Toggle ─────────────────────── */
+        .sidebar-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            cursor: pointer;
+            color: var(--text-2);
+            flex-shrink: 0;
+        }
+        .sidebar-toggle:hover { border-color: var(--border-h); color: var(--text); }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 99;
+            backdrop-filter: blur(3px);
+        }
+        .sidebar-overlay.open { display: block; }
+
         @media (max-width: 840px) {
             .layout { flex-direction: column; }
 
             .sidebar {
-                position: sticky; top: 0;
-                width: 100%; height: auto;
-                flex-direction: column;
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-                overflow-y: visible;
+                position: fixed;
+                left: -100%;
+                top: 0;
+                width: min(280px, 85vw);
+                height: 100vh;
+                transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
+                border-right: 1px solid var(--border-h);
+                border-bottom: none;
+                z-index: 100;
+                overflow-y: auto;
             }
 
-            .sidebar-nav {
-                flex-direction: row;
-                flex-wrap: wrap;
-                padding: 10px 12px;
+            .sidebar.mobile-open {
+                left: 0;
             }
 
-            .nav-group-label { display: none; }
-
-            .sidebar-bottom {
-                border-top: none;
-                border-top: 1px solid var(--border);
-                padding: 10px 12px;
-            }
-
+            .sidebar-toggle { display: flex; }
             .main { margin-left: 0; }
-            .topbar, .page-section { padding: 16px 20px; }
+            .topbar { padding: 12px 16px; gap: 10px; }
+            .page-section { padding: 20px 16px 40px; }
         }
 
         @media (max-width: 640px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .search-input { width: 150px; }
+            .search-input { width: 120px; }
             .topbar { flex-wrap: wrap; }
             .form-row { grid-template-columns: 1fr; }
+            .page-heading { font-size: 15px; }
+            .topbar-right { gap: 6px; }
+            .btn span { display: none; }
         }
 
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr 1fr; }
-            .stat-value { font-size: 28px; }
-            .page-section { padding: 14px 14px 40px; }
+            .stat-value { font-size: 26px; }
+            .page-section { padding: 12px 12px 40px; }
+            .search-input { width: 90px; font-size: 12px; }
+            .table-wrap { font-size: 12px; }
+            td, th { padding: 10px 10px; }
         }
     </style>
 </head>
 <body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <div class="layout">
 
@@ -1112,7 +1141,16 @@
 
         <!-- Topbar -->
         <div class="topbar">
-            <div class="page-heading" id="page-heading">Dashboard</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <div class="page-heading" id="page-heading">Dashboard</div>
+            </div>
             <div class="topbar-right">
                 <div class="search-wrap">
                     <span class="search-icon-pos">
@@ -1921,6 +1959,30 @@
             </div>
         </td></tr>`;
     }
+
+    // ---------------------------------------------------------------
+    // Sidebar Mobile Toggle
+    // ---------------------------------------------------------------
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        sidebar.classList.toggle('mobile-open');
+        overlay.classList.toggle('open');
+        document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+    }
+
+    function closeSidebar() {
+        document.querySelector('.sidebar').classList.remove('mobile-open');
+        document.getElementById('sidebarOverlay').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // Close sidebar when a nav item is clicked on mobile
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 840) closeSidebar();
+        });
+    });
 
     // ---------------------------------------------------------------
     // Logout

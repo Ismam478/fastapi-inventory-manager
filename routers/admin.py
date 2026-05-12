@@ -93,6 +93,8 @@ def update_products(product_id: int, item: ItemInput, db: Session = Depends(get_
         product.description = item.description
         product.quantity = item.quantity
         # product.in_stock = item.in_stock
+        # if item.image_url is not None:
+        #     product.image_url = item.image_url
         db.commit()
         return {"message": f"Product with id {product_id} updated successfully!"}
     else:

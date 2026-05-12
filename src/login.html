@@ -411,12 +411,18 @@
 
         /* Responsive */
         @media (max-width: 640px) {
+            body { padding: 16px; align-items: flex-start; padding-top: 40px; }
+
             .form-card {
-                padding: 32px 24px;
+                padding: 28px 20px;
             }
 
             .header-title {
-                font-size: 28px;
+                font-size: clamp(22px, 7vw, 32px);
+            }
+
+            .header {
+                margin-bottom: 32px;
             }
 
             .container {
@@ -425,17 +431,28 @@
 
             .logo {
                 font-size: 24px;
+                margin-bottom: 16px;
             }
 
             .form-options {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 8px;
             }
 
             .decoration-1,
             .decoration-2 {
                 opacity: 0.04;
             }
+
+            .form-input {
+                font-size: 16px; /* Prevents iOS zoom on focus */
+            }
+        }
+
+        @media (max-width: 380px) {
+            body { padding: 12px; }
+            .form-card { padding: 24px 16px; }
         }
 
         /* Focus visible for accessibility */

@@ -904,6 +904,87 @@
         }
 
         /* ── Responsive ─────────────────────────────────────── */
+        /* ── Hamburger Menu ──────────────────────────────────── */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            z-index: 200;
+        }
+
+        .hamburger span {
+            display: block;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 149;
+            backdrop-filter: blur(4px);
+        }
+
+        .mobile-nav-overlay.open { display: block; }
+
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: min(320px, 85vw);
+            height: 100vh;
+            background: var(--bg2);
+            border-left: 1px solid var(--border);
+            z-index: 150;
+            display: flex;
+            flex-direction: column;
+            padding: 80px 32px 40px;
+            gap: 8px;
+            transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+
+        .mobile-nav.open { right: 0; }
+
+        .mobile-nav a {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--muted);
+            text-decoration: none;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            transition: color 0.2s;
+            display: block;
+        }
+
+        .mobile-nav a:hover { color: var(--primary-l); }
+
+        .mobile-nav .nav-cta {
+            margin-top: 16px;
+            background: var(--primary);
+            color: white !important;
+            padding: 14px 24px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            text-align: center;
+            border: none;
+        }
+
         @media (max-width: 1024px) {
             nav { padding: 0 40px; }
             .nav-links { gap: 24px; }
@@ -917,28 +998,61 @@
             .footer-bottom { flex-direction: column; gap: 20px; }
         }
 
-        @media (max-width: 640px) {
-            nav { padding: 0 20px; height: 64px; }
-            .nav-logo { font-size: 20px; }
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
             .nav-links { display: none; }
+            nav { padding: 0 20px; }
+        }
+
+        @media (max-width: 640px) {
+            nav { height: 64px; }
+            .nav-logo { font-size: 28px !important; letter-spacing: 1px; }
             section { padding: 60px 20px; }
-            .hero-left { padding: 60px 20px 20px; }
-            .hero-title { font-size: 36px; }
-            .hero-subtitle { font-size: 16px; }
-            .section-title { font-size: 32px; }
-            .products-grid { grid-template-columns: 1fr; }
-            .features-grid { grid-template-columns: 1fr; }
-            .stats-strip { grid-template-columns: 1fr; }
-            .footer-top { grid-template-columns: 1fr; }
+            .hero { padding-top: 64px; }
+            .hero-left { padding: 48px 20px 20px; }
+            .hero-title { font-size: clamp(30px, 9vw, 44px); }
+            .hero-subtitle { font-size: 15px; }
+            .hero-actions { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .hero-actions .btn { width: 100%; justify-content: center; }
+            .hero-eyebrow { font-size: 10px; }
+            .section-title { font-size: clamp(28px, 8vw, 40px); }
+            .section-subtitle { font-size: 15px; }
+            .products-grid { grid-template-columns: 1fr; gap: 20px; }
+            .features-grid { grid-template-columns: 1fr; gap: 20px; }
+            .feature-card { padding: 28px 24px; }
+            .stats-strip { grid-template-columns: repeat(2, 1fr); }
+            .stat-item { padding: 28px 16px; }
+            .stat-num { font-size: 36px; }
+            .testimonials-grid { grid-template-columns: 1fr; gap: 20px; }
+            .testimonial-card { padding: 28px 24px; }
+            .contact-form { padding: 28px 20px; }
+            .footer-top { grid-template-columns: repeat(2, 1fr); gap: 24px; }
             footer { padding: 40px 20px 20px; }
+            .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+            .toast { right: 16px; left: 16px; bottom: 20px; }
+        }
+
+        @media (max-width: 380px) {
+            .stats-strip { grid-template-columns: 1fr; }
+            .hero-title { font-size: 28px; }
+            .footer-top { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Mobile Nav Overlay -->
+    <div class="mobile-nav-overlay" id="mobileOverlay" onclick="closeMobileNav()"></div>
+    <div class="mobile-nav" id="mobileNav">
+        <a href="/orders" onclick="closeMobileNav()">Orders</a>
+        <a href="/testimonials" onclick="closeMobileNav()">Reviews</a>
+        <a onclick="closeMobileNav(); document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Contact Us</a>
+        <a href="/signup" class="nav-cta">Sign Up!</a>
+    </div>
+
     <!-- Navigation -->
     <nav>
-        <div class="nav-logo" onclick="scrollTo('home')" style="font-size: 44px;">Nexora</div>
+        <div class="nav-logo" onclick="scrollTo('home')" style="font-size: clamp(22px, 5vw, 38px);">Nexora</div>
         <div class="nav-links">
             <!-- <a onclick="scrollTo('products')" href="/products">Products</a> -->
             <a onclick="scrollTo('orders')" href="/orders">Orders</a>
@@ -946,6 +1060,9 @@
             <a onclick="scrollTo('contact')">Contact Us</a>
             <a onclick="scrollTo('signup')" class="nav-cta" href="/signup">Sign Up!</a>
         </div>
+        <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </button>
     </nav>
 
     <!-- Hero Section -->
@@ -1071,31 +1188,31 @@
         <div class="contact-grid">
             <div>
                 <div class="contact-method">
-                    <div class="contact-icon">📍</div>
+                    <!-- <div class="contact-icon">📍</div>
                     <div>
                         <div class="contact-label">Dhaka Office</div>
                         <div class="contact-value">123 Business Hub, Gulshan</div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="contact-method">
-                    <div class="contact-icon">📞</div>
-                    <div>
+                    <!-- <div class="contact-icon">📞</div> -->
+                    <!-- <div>
                         <div class="contact-label">Phone</div>
                         <div class="contact-value">+880 1700-XXXXXX</div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="contact-method">
-                    <div class="contact-icon">✉️</div>
+                    <div class="contact-icon">📧</div>
                     <div>
                         <div class="contact-label">Email</div>
-                        <div class="contact-value">info@globalimport.bd</div>
+                        <div class="contact-value">nexorahq@gmail.com</div>
                     </div>
                 </div>
                 <div class="contact-method">
                     <div class="contact-icon">⏰</div>
                     <div>
                         <div class="contact-label">Hours</div>
-                        <div class="contact-value">Mon-Fri, 9 AM - 6 PM (GMT+6)</div>
+                        <div class="contact-value">Sat-Thu, 10 AM - 11 PM (GMT+6)</div>
                     </div>
                 </div>
             </div>
@@ -1109,8 +1226,8 @@
                     <input type="email" class="form-input" placeholder="your@email.com" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Company</label>
-                    <input type="text" class="form-input" placeholder="Your company">
+                    <label class="form-label">Number</label>
+                    <input type="text" class="form-input" placeholder="Your phone number">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Message</label>
@@ -1210,6 +1327,23 @@
         }
 
         loadProducts();
+
+        function toggleMobileNav() {
+            const nav = document.getElementById('mobileNav');
+            const overlay = document.getElementById('mobileOverlay');
+            const burger = document.getElementById('hamburger');
+            nav.classList.toggle('open');
+            overlay.classList.toggle('open');
+            burger.classList.toggle('open');
+            document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+        }
+
+        function closeMobileNav() {
+            document.getElementById('mobileNav').classList.remove('open');
+            document.getElementById('mobileOverlay').classList.remove('open');
+            document.getElementById('hamburger').classList.remove('open');
+            document.body.style.overflow = '';
+        }
     </script>
 </body>
 </html>
