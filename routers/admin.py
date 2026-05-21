@@ -8,11 +8,14 @@ import aiofiles
 from pathlib import Path
 import uuid
 
-from src.user_access import require_roles, get_current_user
+from src.user_access import require_roles
+
+allow_admin_only = require_roles(["admin"])
 
 router = APIRouter(
     prefix="/admin",
     tags=["admin"],
+    dependencies=[Depends(allow_admin_only)]
 )
 
 UPLOAD_DIR = "static/uploads"
@@ -38,7 +41,6 @@ def list_products(
     max_price: float = Query(None),
     in_stock: bool = Query(None),
     db: Session = Depends(get_db),
-    current_user: dict = Depends(require_roles(["admin"]))
 ):
     """Get all products with optional filtering and search"""
     query = db.query(Product)
@@ -67,7 +69,7 @@ def list_products(
 
 
 @router.post("/add_products")
-def add_products(item: ItemInput, db: Session = Depends(get_db), current_user: dict = Depends(require_roles(["admin"]))):
+def add_products(item: ItemInput, db: Session = Depends(get_db)):
     new_product = Product(**item.model_dump())
     db.add(new_product)
     db.commit()
@@ -76,7 +78,7 @@ def add_products(item: ItemInput, db: Session = Depends(get_db), current_user: d
 
 
 @router.delete("/delete_products/{product_id}")
-def delete_products(product_id: int = PathParam(...), db: Session = Depends(get_db), current_user: dict = Depends(require_roles(["admin"]))):
+def delete_products(product_id: int = PathParam(...), db: Session = Depends(get_db)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail=f"Product with id {product_id} not found.")
@@ -89,7 +91,7 @@ def delete_products(product_id: int = PathParam(...), db: Session = Depends(get_
     
 
 @router.put("/update_products/{product_id}")
-def update_products(product_id: int = PathParam(...), item: ItemInput = None, db: Session = Depends(get_db), current_user: dict = Depends(require_roles(["admin"]))):
+def update_products(product_id: int = PathParam(...), item: ItemInput = None, db: Session = Depends(get_db)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail=f"Product with id {product_id} not found.")
@@ -112,7 +114,6 @@ async def upload_product_image(
     product_id: int = PathParam(...),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user: dict = Depends(require_roles(["admin"]))
 ):
     """Upload an image for a product"""
     # Verify product exists

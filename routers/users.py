@@ -53,7 +53,7 @@ def login(user: UserLoginInput, db: Session = Depends(get_db)):
     # Verify the password
     if verify_password(user.password, existing_user.password_hash):
         # Create an access token
-        token_data = {"user_id": existing_user.id}
+        token_data = {"sub": existing_user.username, "role": existing_user.role}
         access_token = create_access_token(token_data)
         return {"access_token": access_token, "token_type": "bearer", "message": "Login successful."}
     else:
