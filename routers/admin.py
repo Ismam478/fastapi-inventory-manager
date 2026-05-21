@@ -99,7 +99,7 @@ def update_products(product_id: int = PathParam(...), item: ItemInput = None, db
     product.name = item.name
     product.price = item.price
     product.description = item.description
-    product.quantity = item.quantity
+    product.quantity = item.quantity > 0
     # product.in_stock = item.in_stock
     # if item.image_url is not None:
     #     product.image_url = item.image_url

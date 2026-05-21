@@ -1,7 +1,9 @@
 from dotenv import load_dotenv, find_dotenv
 import os
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer
+from src.database import Session1
+from src.database_model import User
 
 
 load_dotenv(find_dotenv(), override=True)
