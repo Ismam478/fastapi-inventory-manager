@@ -1,6 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float, Text, JSON, Boolean, DateTime, ForeignKey
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field, validator
 from datetime import datetime
 from typing import Optional
 
@@ -18,6 +18,17 @@ class Product(BaseM):
     quantity: int = Column(Integer, nullable=False)
     in_stock: bool = Column(Boolean, nullable=False)
     image_url: str = Column(String(500), nullable=True)
+    category: str = Column(String(50), nullable=True)
+
+
+class ProductImage(BaseM):
+    __tablename__ = "product_images"
+
+    id: int = Column(Integer, primary_key=True)
+    product_id: int = Column(Integer, ForeignKey("products.id"), nullable=False)
+    image_url: str = Column(String(500), nullable=False)
+    upload_order: int = Column(Integer, default=0)
+    created_at: datetime = Column(DateTime, default=datetime.utcnow)
 
 
 class Review(BaseM):
@@ -48,6 +59,7 @@ class ItemInput(BaseModel):
     quantity: int
     in_stock: Optional[bool] = None
     image_url: Optional[str] = None
+    category: Optional[str] = None
     
     @validator('in_stock', pre=False, always=True)
     def set_in_stock_from_quantity(cls, v, values):
@@ -73,6 +85,32 @@ class ContactInput(BaseModel):
     message: str
 
 
+class ProductImageResponse(BaseModel):
+    id: int
+    product_id: int
+    image_url: str
+    upload_order: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ProductResponse(BaseModel):
+    id: int
+    name: str
+    price: float
+    description: str
+    quantity: int
+    in_stock: bool
+    image_url: Optional[str] = None
+    category: Optional[str] = None
+    images: list = []
+
+    class Config:
+        from_attributes = True
+
+
 class ReviewResponse(BaseModel):
     id: int
     product_id: int
@@ -92,12 +130,13 @@ class User(BaseM):
     username: str = Column(String(50), unique=True, nullable=False)
     email: str = Column(String(100), unique=True, nullable=False)
     password_hash: str = Column(String(255), nullable=False)
+    role: str = Column(String(20), default="user")
 
 
 class UserInput(BaseModel):
     username: str
     email: str
-    password: str
+    password: str = Field(..., min_length=8)
 
 class UserLoginInput(BaseModel):
     username: str

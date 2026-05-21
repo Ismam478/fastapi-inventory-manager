@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Query
-from src.database_model import Product, ItemInput, BaseM, Review, ReviewInput, ReviewResponse
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Query, Path as PathParam
+from src.database_model import Product, ItemInput, BaseM, Review, ReviewInput, ReviewResponse, ProductImage, ProductImageResponse
 from src.database import Session1, engine1
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 import os
 import aiofiles
 from pathlib import Path
+import uuid
+
+from src.user_access import require_roles, get_current_user
 
 router = APIRouter(
     prefix="/admin",
@@ -34,7 +37,8 @@ def list_products(
     min_price: float = Query(None),
     max_price: float = Query(None),
     in_stock: bool = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles(["admin"]))
 ):
     """Get all products with optional filtering and search"""
     query = db.query(Product)
@@ -63,7 +67,7 @@ def list_products(
 
 
 @router.post("/add_products")
-def add_products(item: ItemInput, db: Session = Depends(get_db)):
+def add_products(item: ItemInput, db: Session = Depends(get_db), current_user: dict = Depends(require_roles(["admin"]))):
     new_product = Product(**item.model_dump())
     db.add(new_product)
     db.commit()
@@ -71,43 +75,44 @@ def add_products(item: ItemInput, db: Session = Depends(get_db)):
     return {"message": "Product added successfully!", "product": new_product}
 
 
-@router.delete("/delete_products")
-def delete_products(product_id: int, db: Session = Depends(get_db)):
+@router.delete("/delete_products/{product_id}")
+def delete_products(product_id: int = PathParam(...), db: Session = Depends(get_db), current_user: dict = Depends(require_roles(["admin"]))):
     product = db.query(Product).filter(Product.id == product_id).first()
-    if product:
-        # Delete associated reviews
-        db.query(Review).filter(Review.product_id == product_id).delete()
-        db.delete(product)
-        db.commit()
-        return {"message": f"Product with id {product_id} deleted successfully!"}
-    else:
-        return {"message": f"Product with id {product_id} not found."}
+    if not product:
+        raise HTTPException(status_code=404, detail=f"Product with id {product_id} not found.")
+    
+    # Delete associated reviews
+    db.query(Review).filter(Review.product_id == product_id).delete()
+    db.delete(product)
+    db.commit()
+    return {"message": f"Product with id {product_id} deleted successfully!"}
     
 
-@router.put("/update_products")
-def update_products(product_id: int, item: ItemInput, db: Session = Depends(get_db)):
+@router.put("/update_products/{product_id}")
+def update_products(product_id: int = PathParam(...), item: ItemInput = None, db: Session = Depends(get_db), current_user: dict = Depends(require_roles(["admin"]))):
     product = db.query(Product).filter(Product.id == product_id).first()
-    if product:
-        product.name = item.name
-        product.price = item.price
-        product.description = item.description
-        product.quantity = item.quantity
-        # product.in_stock = item.in_stock
-        # if item.image_url is not None:
-        #     product.image_url = item.image_url
-        db.commit()
-        return {"message": f"Product with id {product_id} updated successfully!"}
-    else:
-        return {"message": f"Product with id {product_id} not found."}
+    if not product:
+        raise HTTPException(status_code=404, detail=f"Product with id {product_id} not found.")
+    
+    product.name = item.name
+    product.price = item.price
+    product.description = item.description
+    product.quantity = item.quantity
+    # product.in_stock = item.in_stock
+    # if item.image_url is not None:
+    #     product.image_url = item.image_url
+    db.commit()
+    return {"message": f"Product with id {product_id} updated successfully!"}
 
 
 # ============ IMAGE UPLOAD ENDPOINT ============
 
-@router.post("/upload-image")
+@router.post("/upload-image/{product_id}")
 async def upload_product_image(
-    product_id: int,
+    product_id: int = PathParam(...),
     file: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles(["admin"]))
 ):
     """Upload an image for a product"""
     # Verify product exists
@@ -124,9 +129,9 @@ async def upload_product_image(
             detail=f"File type not allowed. Allowed types: {allowed_extensions}"
         )
     
-    # Generate unique filename
-    filename = f"product_{product_id}_{file.filename}"
-    filepath = os.path.join(UPLOAD_DIR, filename)
+    # Generate unique filename with UUID to avoid conflicts
+    unique_filename = f"product_{product_id}_{uuid.uuid4().hex[:8]}.{file_ext}"
+    filepath = os.path.join(UPLOAD_DIR, unique_filename)
     
     # Save file
     try:
@@ -134,15 +139,26 @@ async def upload_product_image(
         async with aiofiles.open(filepath, "wb") as f:
             await f.write(contents)
         
-        # Update product with image URL
-        image_url = f"/static/uploads/{filename}"
-        product.image_url = image_url
+        # Get the next upload order number
+        last_image = db.query(ProductImage).filter(ProductImage.product_id == product_id).order_by(ProductImage.upload_order.desc()).first()
+        next_order = (last_image.upload_order + 1) if last_image else 0
+        
+        # Save to database
+        image_url = f"/static/uploads/{unique_filename}"
+        product_image = ProductImage(
+            product_id=product_id,
+            image_url=image_url,
+            upload_order=next_order
+        )
+        db.add(product_image)
         db.commit()
+        db.refresh(product_image)
         
         return {
             "message": "Image uploaded successfully",
-            "filename": filename,
-            "image_url": image_url
+            "filename": unique_filename,
+            "image_url": image_url,
+            "upload_order": next_order
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")

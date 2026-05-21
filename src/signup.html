@@ -478,7 +478,7 @@
             <!-- Success message -->
             <div class="success-message" id="successMessage">
                 <div class="success-message-title">Account Created Successfully!</div>
-                <div class="success-message-text">Redirecting you in a moment...</div>
+                <div class="success-message-text">Your account has been created. You can now log in.</div>
             </div>
 
             <!-- Form -->
@@ -705,10 +705,7 @@
                     document.getElementById('signupForm').style.opacity = '0.5';
                     document.getElementById('signupForm').style.pointerEvents = 'none';
 
-                    // Redirect after 2 seconds
-                    setTimeout(() => {
-                        window.location.href = '/home';
-                    }, 2000);
+                    // No redirect - user stays on signup page
                 } else {
                     showError('passwordError', data.message || 'Sign up failed. Please try again.');
                     submitBtn.disabled = false;

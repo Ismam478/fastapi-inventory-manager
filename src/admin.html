@@ -1200,7 +1200,7 @@
                     <div class="stat-sub">need restock</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Avg. Price</div>
+                    <div class="stat-label">Total Stock</div>
                     <div class="stat-value clr-gold" id="stat-avgprice">—</div>
                     <div class="stat-sub">across catalog</div>
                 </div>
@@ -1343,6 +1343,22 @@
             <div class="form-group">
                 <label class="form-label">Description</label>
                 <textarea id="f-desc" class="form-textarea" placeholder="Product description…"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <select id="f-category" class="form-input" style="padding: 8px 12px; cursor: pointer;">
+                    <option value="">Select a category</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Audio">Audio</option>
+                    <option value="Beauty">Beauty</option>
+                    <option value="Home">Home</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="Stationery">Stationery</option>
+                    <option value="Other">Other</option>
+                </select>
             </div>
         </div>
         <div class="modal-foot">
@@ -1703,6 +1719,7 @@
         document.getElementById('f-price').value    = p.price       || '';
         document.getElementById('f-qty').value      = p.quantity    || '';
         document.getElementById('f-desc').value     = p.description || '';
+        document.getElementById('f-category').value = p.category    || '';
         openModal('overlay-product');
     }
 
@@ -1716,6 +1733,7 @@
         const price    = parseFloat(document.getElementById('f-price').value);
         const quantity = parseInt(document.getElementById('f-qty').value, 10);
         const description = document.getElementById('f-desc').value.trim();
+        const category = document.getElementById('f-category').value.trim();
         const imageUrl = document.getElementById('f-image-url').value || null;
 
         if (!name)              { toast('error', 'Product name is required.');   return; }
@@ -1726,7 +1744,7 @@
         btn.disabled = true;
         btn.textContent = 'Saving…';
 
-        const payload = { name, price, description, quantity };
+        const payload = { name, price, description, quantity, category };
         if (imageUrl) payload.image_url = imageUrl;
 
         try {

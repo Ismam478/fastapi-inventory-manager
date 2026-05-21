@@ -3,6 +3,8 @@ from src.database_model import Product, ItemInput, BaseM, User, UserInput, UserL
 from src.database import Session1, engine1
 from sqlalchemy.orm import Session
 from src.authentication import hash_password, verify_password
+from src.user_access import create_access_token
+
 
 
 router = APIRouter(
@@ -23,6 +25,7 @@ def get_db():
 def signup(user: UserInput, db: Session = Depends(get_db)):
     # Check if user already exists
     existing_user = db.query(User).filter(User.username == user.username).first()
+    
     if existing_user:
         return {"message": "User already exists."}
 
@@ -37,7 +40,7 @@ def signup(user: UserInput, db: Session = Depends(get_db)):
     )
     db.add(new_user)
     db.commit()
-    return {"message": "User created successfully."}
+    return {"message": f"Hello, {user.username}! Your account has been created. Check your email for verification."}
 
 
 @router.post("/login")
@@ -45,10 +48,14 @@ def login(user: UserLoginInput, db: Session = Depends(get_db)):
     # Check if user exists
     existing_user = db.query(User).filter(User.username == user.username).first()
     if not existing_user:
-        return {"message": "Invalid username or password."}
+        raise HTTPException(status_code=401, detail="Invalid username or password.")
 
     # Verify the password
     if verify_password(user.password, existing_user.password_hash):
-        return {"message": "Login successful."}
+        # Create an access token
+        token_data = {"user_id": existing_user.id}
+        access_token = create_access_token(token_data)
+        return {"access_token": access_token, "token_type": "bearer", "message": "Login successful."}
     else:
-        return {"message": "Invalid username or password."}
+        raise HTTPException(status_code=401, detail="Invalid username or password.")
+    

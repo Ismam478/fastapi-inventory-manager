@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Query
-from src.database_model import Product, ItemInput, BaseM, Review, ReviewInput, ReviewResponse
+from src.database_model import Product, ItemInput, BaseM, Review, ReviewInput, ReviewResponse, ProductResponse, ProductImage, ProductImageResponse
 from src.database import Session1, engine1
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -56,94 +56,21 @@ def list_products(
     
     products = query.all()
     
+    # Add images to each product
+    product_responses = []
+    for p in products:
+        product_resp = ProductResponse.model_validate(p)
+        images = db.query(ProductImage).filter(ProductImage.product_id == p.id).order_by(ProductImage.upload_order).all()
+        product_resp.images = [ProductImageResponse.model_validate(img) for img in images]
+        # Set image_url to the first image if available
+        if images:
+            product_resp.image_url = images[0].image_url
+        product_responses.append(product_resp)
+    
     return {
-        "total": len(products),
-        "products": products
+        "total": len(product_responses),
+        "products": product_responses
     }
-
-
-@router.post("/admin/add_products")
-def add_products(item: ItemInput, db: Session = Depends(get_db)):
-    new_product = Product(**item.model_dump())
-    db.add(new_product)
-    db.commit()
-    db.refresh(new_product)
-    return {"message": "Product added successfully!", "product": new_product}
-
-
-@router.delete("/admin/delete_products")
-def delete_products(product_id: int, db: Session = Depends(get_db)):
-    product = db.query(Product).filter(Product.id == product_id).first()
-    if product:
-        # Delete associated reviews
-        db.query(Review).filter(Review.product_id == product_id).delete()
-        db.delete(product)
-        db.commit()
-        return {"message": f"Product with id {product_id} deleted successfully!"}
-    else:
-        return {"message": f"Product with id {product_id} not found."}
-    
-
-@router.put("/admin/update_products")
-def update_products(product_id: int, item: ItemInput, db: Session = Depends(get_db)):
-    product = db.query(Product).filter(Product.id == product_id).first()
-    if product:
-        product.name = item.name
-        product.price = item.price
-        product.description = item.description
-        product.quantity = item.quantity
-        # product.in_stock = item.in_stock
-        db.commit()
-        return {"message": f"Product with id {product_id} updated successfully!"}
-    else:
-        return {"message": f"Product with id {product_id} not found."}
-
-
-# ============ IMAGE UPLOAD ENDPOINT ============
-
-@router.post("/admin/upload-image")
-async def upload_product_image(
-    product_id: int,
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db)
-):
-    """Upload an image for a product"""
-    # Verify product exists
-    product = db.query(Product).filter(Product.id == product_id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    # Validate file type
-    allowed_extensions = {"jpg", "jpeg", "png", "gif", "webp"}
-    file_ext = file.filename.split(".")[-1].lower()
-    if file_ext not in allowed_extensions:
-        raise HTTPException(
-            status_code=400,
-            detail=f"File type not allowed. Allowed types: {allowed_extensions}"
-        )
-    
-    # Generate unique filename
-    filename = f"product_{product_id}_{file.filename}"
-    filepath = os.path.join(UPLOAD_DIR, filename)
-    
-    # Save file
-    try:
-        contents = await file.read()
-        async with aiofiles.open(filepath, "wb") as f:
-            await f.write(contents)
-        
-        # Update product with image URL
-        image_url = f"/static/uploads/{filename}"
-        product.image_url = image_url
-        db.commit()
-        
-        return {
-            "message": "Image uploaded successfully",
-            "filename": filename,
-            "image_url": image_url
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
 
 
 # ============ REVIEW ENDPOINTS ============
