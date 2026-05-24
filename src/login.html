@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign In - Nexora</title>
+    <title>Login - Nexora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <style>
@@ -15,20 +15,13 @@
             --bg3: #1b1b27;
             --card: #18182a;
             --border: rgba(255,255,255,0.07);
-            --border-h: rgba(255,255,255,0.1);
             --primary: #7c3aed;
             --primary-l: #9d5cf7;
             --accent: #06d6a0;
             --text: #f0f0f5;
-            --text-2: #e8e8f0;
             --muted: #7a7a88;
-            --muted-2: #5a5a68;
             --radius: 12px;
-            --radius-sm: 8px;
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
         }
         
         html { scroll-behavior: smooth; }
@@ -55,7 +48,6 @@
             opacity: 0.4;
         }
 
-        /* Background decoration */
         .bg-decoration {
             position: fixed;
             inset: 0;
@@ -86,15 +78,13 @@
             left: -50px;
         }
 
-        /* Main container */
         .container {
             width: 100%;
-            max-width: 420px;
+            max-width: 450px;
             position: relative;
             z-index: 10;
         }
 
-        /* Header */
         .header {
             text-align: center;
             margin-bottom: 48px;
@@ -107,16 +97,13 @@
             font-weight: 700;
             letter-spacing: 2px;
             color: var(--primary);
-            text-decoration: none;
             display: inline-block;
             margin-bottom: 24px;
             cursor: pointer;
             transition: color var(--transition);
         }
 
-        .logo:hover {
-            color: var(--primary-l);
-        }
+        .logo:hover { color: var(--primary-l); }
 
         .header-title {
             font-family: 'Playfair Display', serif;
@@ -132,18 +119,6 @@
             font-weight: 300;
         }
 
-        .header-subtitle a {
-            color: var(--primary);
-            text-decoration: none;
-            transition: color var(--transition);
-            font-weight: 500;
-        }
-
-        .header-subtitle a:hover {
-            color: var(--primary-l);
-        }
-
-        /* Form card */
         .form-card {
             background: var(--card);
             border: 1px solid var(--border);
@@ -159,50 +134,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Alert messages */
-        .alert {
-            padding: 12px 16px;
-            border-radius: var(--radius-sm);
-            margin-bottom: 24px;
-            font-size: 13px;
-            display: none;
-            animation: slideDown 0.4s ease;
-        }
-
-        .alert.show {
-            display: block;
-        }
-
-        .alert-error {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-        }
-
-        .alert-warning {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: #fcd34d;
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #6ee7b7;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Form groups */
         .form-group {
             margin-bottom: 24px;
             animation: fadeUp 0.6s ease both;
@@ -221,110 +152,61 @@
             margin-bottom: 8px;
         }
 
-        .form-input-group {
-            position: relative;
-        }
-
         .form-input {
             width: 100%;
             padding: 12px 16px;
             background: var(--bg3);
             border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
+            border-radius: 8px;
             color: var(--text);
             font-family: 'Inter', sans-serif;
             font-size: 14px;
-            transition: border-color var(--transition), background-color var(--transition), box-shadow var(--transition);
+            transition: border-color var(--transition), box-shadow var(--transition);
             outline: none;
         }
 
         .form-input:focus {
             border-color: var(--primary);
-            background: var(--bg3);
             box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
         }
 
-        .form-input::placeholder {
-            color: var(--muted-2);
+        .form-input::placeholder { color: #5a5a68; }
+
+        .form-messages {
+            margin-top: 16px;
         }
 
-        /* Password visibility toggle */
-        .password-toggle {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--muted);
-            cursor: pointer;
-            font-size: 18px;
-            transition: color var(--transition);
-            padding: 0;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .password-toggle:hover {
-            color: var(--primary);
-        }
-
-        /* Remember me and forgot password */
-        .form-options {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            gap: 12px;
-            animation: fadeUp 0.6s 0.2s ease both;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .remember-me input {
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
-
-        .remember-me label {
+        .form-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 12px;
             font-size: 13px;
-            color: var(--muted);
-            cursor: pointer;
-            transition: color var(--transition);
+            color: #fca5a5;
+            display: none;
         }
 
-        .remember-me:hover label {
-            color: var(--text);
-        }
+        .form-error.show { display: block; }
 
-        .forgot-password {
+        .form-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 12px;
             font-size: 13px;
-            color: var(--primary);
-            text-decoration: none;
-            transition: color var(--transition);
-            font-weight: 500;
+            color: #86efac;
+            display: none;
         }
 
-        .forgot-password:hover {
-            color: var(--primary-l);
-        }
+        .form-success.show { display: block; }
 
-        /* Submit button */
         .submit-btn {
             width: 100%;
             padding: 14px 24px;
             background: linear-gradient(135deg, var(--primary), var(--primary-l));
             color: white;
             border: none;
-            border-radius: var(--radius-sm);
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             letter-spacing: 0.5px;
@@ -340,364 +222,133 @@
             box-shadow: 0 12px 32px rgba(124, 58, 237, 0.4);
         }
 
-        .submit-btn:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
         .submit-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
 
-        .submit-btn.loading::after {
-            content: '';
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            margin-left: 8px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Divider */
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 24px 0;
-            gap: 16px;
-            opacity: 0.3;
-        }
-
-        .divider-line {
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .divider-text {
-            font-size: 12px;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Sign up link */
-        .signup-section {
+        .footer-link {
             text-align: center;
-            padding-top: 12px;
-        }
-
-        .signup-section p {
+            margin-top: 24px;
             font-size: 13px;
             color: var(--muted);
+            animation: fadeUp 0.6s 0.3s ease both;
         }
 
-        .signup-section a {
+        .footer-link a {
             color: var(--primary);
             text-decoration: none;
-            font-weight: 600;
             transition: color var(--transition);
         }
 
-        .signup-section a:hover {
-            color: var(--primary-l);
+        .footer-link a:hover { color: var(--primary-l); }
+
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+            animation: fadeUp 0.6s 0.25s ease both;
         }
 
-        /* Responsive */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-l));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg3);
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
         @media (max-width: 640px) {
-            body { padding: 16px; align-items: flex-start; padding-top: 40px; }
-
-            .form-card {
-                padding: 28px 20px;
-            }
-
-            .header-title {
-                font-size: clamp(22px, 7vw, 32px);
-            }
-
-            .header {
-                margin-bottom: 32px;
-            }
-
-            .container {
-                max-width: 100%;
-            }
-
-            .logo {
-                font-size: 24px;
-                margin-bottom: 16px;
-            }
-
-            .form-options {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
-
-            .decoration-1,
-            .decoration-2 {
-                opacity: 0.04;
-            }
-
-            .form-input {
-                font-size: 16px; /* Prevents iOS zoom on focus */
-            }
-        }
-
-        @media (max-width: 380px) {
-            body { padding: 12px; }
-            .form-card { padding: 24px 16px; }
-        }
-
-        /* Focus visible for accessibility */
-        .form-input:focus-visible,
-        .submit-btn:focus-visible,
-        .remember-me input:focus-visible,
-        .password-toggle:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-
-        /* Error state for inputs */
-        .form-input.error {
-            border-color: var(--danger);
-        }
-
-        .form-input.error:focus {
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+            body { padding: 16px; align-items: flex-start; padding-top: 32px; }
+            .form-card { padding: 32px 24px; }
+            .header { margin-bottom: 32px; }
+            .header-title { font-size: 28px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Background decoration -->
     <div class="bg-decoration">
         <div class="decoration-circle decoration-1"></div>
         <div class="decoration-circle decoration-2"></div>
     </div>
 
-    <!-- Main container -->
     <div class="container">
-        <!-- Header -->
         <div class="header">
-            <a href="/home" class="logo">Nexora</a>
+            <div class="logo">Nexora</div>
             <h1 class="header-title">Welcome Back</h1>
-            <p class="header-subtitle">
-                Don't have an account? <a href="/signup">Create one</a>
-            </p>
+            <p class="header-subtitle">Sign in to your admin account</p>
         </div>
 
-        <!-- Form card -->
         <div class="form-card">
-            <!-- Alert messages -->
-            <div class="alert alert-error" id="alertError"></div>
-            <div class="alert alert-warning" id="alertWarning"></div>
-            <div class="alert alert-success" id="alertSuccess"></div>
-
-            <!-- Form -->
-            <form id="loginForm" onsubmit="handleSubmit(event)">
-                <!-- Username/Email field -->
+            <form id="loginForm">
                 <div class="form-group">
-                    <label class="form-label" for="username">Username or Email</label>
+                    <label class="form-label" for="username">Username</label>
                     <input
                         type="text"
                         id="username"
-                        name="username"
-                        class="form-input"
-                        placeholder="Enter your username or email"
                         required
-                        autocomplete="username"
-                    />
+                        class="form-input"
+                        placeholder="Enter your username"
+                    >
                 </div>
 
-                <!-- Password field -->
                 <div class="form-group">
                     <label class="form-label" for="password">Password</label>
-                    <div class="form-input-group">
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-input"
-                            placeholder="Enter your password"
-                            required
-                            autocomplete="current-password"
-                        />
-                        <button
-                            type="button"
-                            class="password-toggle"
-                            id="passwordToggle"
-                            onclick="togglePasswordVisibility()"
-                            tabindex="-1"
-                        >
-                            👁️
-                        </button>
-                    </div>
+                    <input
+                        type="password"
+                        id="password"
+                        required
+                        class="form-input"
+                        placeholder="Enter your password"
+                    >
                 </div>
 
-                <!-- Remember me and Forgot password -->
-                <div class="form-options">
-                    <label class="remember-me">
-                        <input
-                            type="checkbox"
-                            id="rememberMe"
-                            name="rememberMe"
-                        />
-                        <span>Remember me</span>
-                    </label>
-                    <a href="/forgot-password" class="forgot-password">Forgot password?</a>
+                <div class="form-messages">
+                    <div id="errorMessage" class="form-error"></div>
+                    <div id="successMessage" class="form-success"></div>
                 </div>
 
-                <!-- Submit button -->
-                <button type="submit" class="submit-btn" id="submitBtn">
-                    Sign In
-                </button>
+                <button type="submit" id="submitBtn" class="submit-btn">Sign In</button>
             </form>
 
-            <!-- Divider -->
-            <div class="divider">
-                <div class="divider-line"></div>
-                <div class="divider-text">Or</div>
-                <div class="divider-line"></div>
+            <div id="signupLink" class="footer-link">
+                Don't have an account? <a href="/signup">Sign up here</a>
             </div>
 
-            <!-- Sign up section -->
-            <div class="signup-section">
-                <p>
-                    New to Nexora? 
-                    <a href="/signup">Create your account now</a>
-                </p>
+            <div id="profileSection" class="profile-actions" style="display: none;">
+                <button onclick="goToAdmin()" class="btn btn-primary">Go to Dashboard</button>
+                <button onclick="handleLogout()" class="btn btn-secondary">Logout</button>
             </div>
         </div>
     </div>
 
-    <script>
-        const API_BASE = window.location.origin;
-
-        // Password visibility toggle
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const toggleBtn = document.getElementById('passwordToggle');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleBtn.textContent = '🙈';
-            } else {
-                passwordInput.type = 'password';
-                toggleBtn.textContent = '👁️';
-            }
-        }
-
-        // Show alert message
-        function showAlert(type, message) {
-            const alertElement = document.getElementById(`alert${type}`);
-            if (alertElement) {
-                alertElement.textContent = message;
-                alertElement.classList.add('show');
-
-                // Auto-hide after 5 seconds
-                setTimeout(() => {
-                    alertElement.classList.remove('show');
-                }, 5000);
-            }
-        }
-
-        // Form submission
-        async function handleSubmit(event) {
-            event.preventDefault();
-
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
-
-            // Clear previous alerts
-            document.querySelectorAll('.alert').forEach(el => el.classList.remove('show'));
-            document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
-
-            // Basic validation
-            if (!username || !password) {
-                showAlert('Error', 'Please enter both username and password');
-                return;
-            }
-
-            if (password.length < 8) {
-                showAlert('Error', 'Password must be at least 8 characters');
-                return;
-            }
-
-            // Disable button and show loading state
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.classList.add('loading');
-
-            try {
-                const response = await fetch(`${API_BASE}/users/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password,
-                    }),
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.message === 'Login successful.') {
-                    // Store remember me preference
-                    if (rememberMe) {
-                        localStorage.setItem('rememberMe', 'true');
-                        localStorage.setItem('username', username);
-                    }
-
-                    showAlert('Success', 'Login successful! Redirecting...');
-                    
-                    // Redirect after 1.5 seconds
-                    setTimeout(() => {
-                        window.location.href = '/home';
-                    }, 1500);
-                } else {
-                    // Add error style to inputs
-                    document.getElementById('username').classList.add('error');
-                    document.getElementById('password').classList.add('error');
-                    
-                    showAlert('Error', data.message || 'Invalid credentials. Please try again.');
-                    submitBtn.disabled = false;
-                    submitBtn.classList.remove('loading');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showAlert('Error', 'An error occurred. Please try again.');
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('loading');
-            }
-        }
-
-        // Remove error state on input
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.addEventListener('input', () => {
-                input.classList.remove('error');
-            });
-        });
-
-        // Pre-fill username if remember me was checked
-        window.addEventListener('load', () => {
-            if (localStorage.getItem('rememberMe') === 'true') {
-                const savedUsername = localStorage.getItem('username');
-                if (savedUsername) {
-                    document.getElementById('username').value = savedUsername;
-                    document.getElementById('rememberMe').checked = true;
-                }
-            }
-        });
-    </script>
-
+    <script src="/static/js/auth.js"></script>
 </body>
 </html>
